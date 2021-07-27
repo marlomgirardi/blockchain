@@ -3,15 +3,30 @@ import { Nonce, Hash, BlockData } from "./utils";
 import Block from "./Block";
 import Transaction from "./Transaction";
 
+let blockchain: Blockchain;
+
 class Blockchain {
   chain: Block[] = [];
   pendingTransactions: Transaction[] = [];
+  networkNodes: string[] = [];
+  currentNodeUrl = process.argv[3]; // TODO: put in a better place
 
-  constructor() {
+  private constructor() {
     // Create genesis block
     // https://tecracoin.medium.com/what-is-genesis-block-and-why-genesis-block-is-needed-1b37d4b75e43
     this.createBlock(100, "0", "0");
   }
+
+  static getInstance() {
+    if (blockchain instanceof Blockchain) {
+      return blockchain;
+    }
+
+    blockchain = new Blockchain();
+    return blockchain;
+  }
+
+  bootstrap() {}
 
   // TODO: Extract block to its own class
   createBlock(nonce: Nonce, previousBlockHash: Hash, hash: Hash): Block {
