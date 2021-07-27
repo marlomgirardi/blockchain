@@ -9,7 +9,7 @@ class Blockchain {
   chain: Block[] = [];
   pendingTransactions: Transaction[] = [];
   networkNodes: string[] = [];
-  currentNodeUrl = process.argv[3]; // TODO: put in a better place
+  currentNodeUrl: string = "";
 
   private constructor() {
     // Create genesis block
@@ -18,15 +18,18 @@ class Blockchain {
   }
 
   static getInstance() {
-    if (blockchain instanceof Blockchain) {
-      return blockchain;
-    }
-
-    blockchain = new Blockchain();
+    blockchain = blockchain ?? new Blockchain();
     return blockchain;
   }
 
-  bootstrap() {}
+  static bootstrap(nodeUrl: string) {
+    if (!nodeUrl) {
+      throw new Error("Node URL not provided.");
+    }
+
+    const instance = Blockchain.getInstance();
+    instance.currentNodeUrl = nodeUrl;
+  }
 
   // TODO: Extract block to its own class
   createBlock(nonce: Nonce, previousBlockHash: Hash, hash: Hash): Block {
