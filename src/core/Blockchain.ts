@@ -1,5 +1,5 @@
 import SHA from "sha.js";
-import { Nonce, Hash } from "./utils";
+import { Nonce, Hash, BlockData } from "./utils";
 import Block from "./Block";
 import Transaction from "./Transaction";
 
@@ -30,23 +30,15 @@ class Blockchain {
     return newBlock;
   }
 
-  getLastBlock(): Block {
-    return this.chain[this.chain.length - 1];
-  }
+  getLastBlock = (): Block => this.chain[this.chain.length - 1];
 
-  createTransaction(amount: Transaction["amount"], sender: Transaction["sender"], recipient: Transaction["recipient"]) {
-    const newTransaction: Transaction = {
-      amount,
-      sender,
-      recipient,
-    };
-
+  createTransaction(from: Transaction["from"], to: Transaction["to"], amount: Transaction["amount"]) {
+    const newTransaction: Transaction = { from, to, amount };
     this.pendingTransactions.push(newTransaction);
-
     return this.getLastBlock()["index"] + 1;
   }
 
-  hashBlock(previousBlockHash: Hash, currentBlockData: Block["transactions"], nonce: Nonce) {
+  hashBlock(previousBlockHash: Hash, currentBlockData: BlockData, nonce: Nonce) {
     const Sha256 = SHA("sha256");
     const dataAsString = previousBlockHash + nonce.toString() + JSON.stringify(currentBlockData);
     return Sha256.update(dataAsString).digest("hex");
@@ -55,7 +47,7 @@ class Blockchain {
   /**
    * @external https://en.bitcoin.it/wiki/Proof_of_work
    */
-  proofOfWork(previousBlockHash: Hash, currentBlockData: Block["transactions"]) {
+  proofOfWork(previousBlockHash: Hash, currentBlockData: BlockData) {
     let nonce = -1;
     let hash;
 
