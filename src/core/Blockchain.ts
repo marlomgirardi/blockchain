@@ -81,6 +81,35 @@ class Blockchain {
 
     return nonce;
   }
+
+  isChainValid = (blocks: Block[]): boolean => {
+    const genesisBlock = blocks[0];
+    const correctNonce = genesisBlock.nonce === 100;
+    const correctPreviousHash = genesisBlock.previousBlockHash === "0";
+    const correctHash = genesisBlock.hash === "0";
+    const correctTransactions = genesisBlock.transactions.length === 0;
+    const isCorrectGenesisBlock = correctNonce && correctPreviousHash && correctHash && correctTransactions;
+
+    if (!isCorrectGenesisBlock) {
+      return false;
+    }
+
+    for (let i = 1; i < blocks.length; i++) {
+      const block = blocks[i];
+      const previousBlock = blocks[i - 1];
+      const blockHash = this.hashBlock(
+        previousBlock.hash,
+        { transactions: block.transactions, index: block.index },
+        block.nonce
+      );
+
+      if (blockHash.substr(0, 4) !== "0000" || block.previousBlockHash !== previousBlock.hash) {
+        return false;
+      }
+    }
+
+    return true;
+  };
 }
 
 export default Blockchain;
