@@ -2,6 +2,7 @@ import SHA from "sha.js";
 import { Nonce, Hash, BlockData } from "./utils";
 import Block from "./Block";
 import Transaction from "./Transaction";
+import { v1 as uuid } from "uuid";
 
 let blockchain: Blockchain;
 
@@ -50,9 +51,14 @@ class Blockchain {
 
   getLastBlock = (): Block => this.chain[this.chain.length - 1];
 
-  createTransaction(from: Transaction["from"], to: Transaction["to"], amount: Transaction["amount"]) {
-    const newTransaction: Transaction = { from, to, amount };
-    this.pendingTransactions.push(newTransaction);
+  createTransaction(from: Transaction["from"], to: Transaction["to"], amount: Transaction["amount"]): Transaction {
+    const newTransaction: Transaction = { from, to, amount, id: uuid().replace(/-/g, "") };
+
+    return newTransaction;
+  }
+
+  addPendingTransaction(transaction: Transaction) {
+    this.pendingTransactions.push(transaction);
     return this.getLastBlock()["index"] + 1;
   }
 
