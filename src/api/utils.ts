@@ -1,7 +1,7 @@
 import fetch from "node-fetch";
 import Blockchain from "../core/Blockchain";
 
-export function post(url: string, body: object) {
+export function post<T = object>(url: string, body: T) {
   return fetch(url, {
     method: "POST",
     headers: {
@@ -14,13 +14,5 @@ export function post(url: string, body: object) {
 type Actions = "node" | "block/receive" | "transaction";
 export function broadcastToNodes<T = object>(nodes: Blockchain["networkNodes"], action: Actions, data: T) {
   // This is not scalable but this is just a test, so not a problem.
-  const broadcast = nodes.map((nodeUrl) => {
-    return post(`${nodeUrl}/${action}`, {
-      method: "POST",
-      body: JSON.stringify(data),
-      headers: { "Content-Type": "application/json" },
-    });
-  });
-
-  return Promise.all(broadcast);
+  return Promise.all(nodes.map((nodeUrl) => post<T>(`${nodeUrl}/${action}`, data)));
 }

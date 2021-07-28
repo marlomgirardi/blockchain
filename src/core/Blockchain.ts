@@ -1,8 +1,7 @@
 import SHA from "sha.js";
-import { Nonce, Hash, BlockData } from "./utils";
+import { Nonce, Hash, BlockData, generateUUID } from "./utils";
 import Block from "./Block";
 import Transaction from "./Transaction";
-import { v1 as uuid } from "uuid";
 
 let blockchain: Blockchain;
 
@@ -52,7 +51,7 @@ class Blockchain {
   getLastBlock = (): Block => this.chain[this.chain.length - 1];
 
   createTransaction(from: Transaction["from"], to: Transaction["to"], amount: Transaction["amount"]): Transaction {
-    const newTransaction: Transaction = { from, to, amount, id: uuid().replace(/-/g, "") };
+    const newTransaction: Transaction = { from, to, amount, id: generateUUID() };
 
     return newTransaction;
   }

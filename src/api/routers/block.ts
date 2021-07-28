@@ -1,14 +1,13 @@
 import { Request, Router } from "express";
-import { v1 as uuid } from "uuid";
 import Block from "../../core/Block";
 import Blockchain from "../../core/Blockchain";
 import { MINER_REWARD_FROM_ADDRESS } from "../../core/constants";
-import { BlockData } from "../../core/utils";
+import { BlockData, generateUUID } from "../../core/utils";
 import { broadcastToNodes, post } from "../utils";
 
 const router = Router();
 const blockchain = Blockchain.getInstance();
-const nodeAddress = uuid().replace(/-/g, "");
+const nodeAddress = generateUUID();
 
 router.post("/mine", (req, res) => {
   const { hash: previousBlockHash, index: previousBlockIndex } = blockchain.getLastBlock();
