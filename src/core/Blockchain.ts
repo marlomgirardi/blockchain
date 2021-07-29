@@ -50,6 +50,10 @@ class Blockchain {
 
   getLastBlock = (): Block => this.chain[this.chain.length - 1];
 
+  getBlock(hash: Hash): Block | null {
+    return this.chain.find((block) => block.hash === hash) ?? null;
+  }
+
   createTransaction(from: Transaction["from"], to: Transaction["to"], amount: Transaction["amount"]): Transaction {
     const newTransaction: Transaction = { from, to, amount, id: generateUUID() };
 
@@ -59,6 +63,20 @@ class Blockchain {
   addPendingTransaction(transaction: Transaction) {
     this.pendingTransactions.push(transaction);
     return this.getLastBlock()["index"] + 1;
+  }
+
+  getTransaction(id: string): { transaction: Transaction; block: Block } | null {
+    for (const block of this.chain) {
+      const transaction = block.transactions.find((transaction) => transaction.id === id);
+      if (transaction) {
+        return {
+          transaction,
+          block,
+        };
+      }
+    }
+
+    return null;
   }
 
   hashBlock(previousBlockHash: Hash, currentBlockData: BlockData, nonce: Nonce) {
@@ -110,6 +128,26 @@ class Blockchain {
 
     return true;
   };
+
+  getAddressData(address: string): { transactions: Transaction[]; balance: number } {
+    const transactions: Transaction[] = [];
+    let balance = 0;
+
+    this.chain.forEach((block) => {
+      block.transactions.forEach((transaction) => {
+        const isFrom = transaction.from === address;
+        const isTo = transaction.to === address;
+        if (isFrom || isTo) {
+          transactions.push(transaction);
+
+          if (isTo) balance += transaction.amount;
+          if (isFrom) balance -= transaction.amount;
+        }
+      });
+    });
+
+    return { transactions, balance };
+  }
 }
 
 export default Blockchain;

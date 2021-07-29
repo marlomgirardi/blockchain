@@ -6,6 +6,13 @@ import { broadcastToNodes } from "../utils";
 const router = Router();
 const blockchain = Blockchain.getInstance();
 
+router.get("/transaction/:id", function (req, res) {
+  const id = req.params.id;
+  const transaction = blockchain.getTransaction(id);
+
+  res.json(transaction);
+});
+
 router.post("/", (req: Request<{}, any, Transaction>, res) => {
   const transaction = req.body;
   const blockIndex = blockchain.addPendingTransaction(transaction);

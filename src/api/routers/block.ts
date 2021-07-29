@@ -9,6 +9,12 @@ const router = Router();
 const blockchain = Blockchain.getInstance();
 const nodeAddress = generateUUID();
 
+router.get("/:hash", function (req, res) {
+  const hash = req.params.hash;
+  const block = blockchain.getBlock(hash);
+  res.json({ block });
+});
+
 router.post("/mine", (req, res) => {
   const { hash: previousBlockHash, index: previousBlockIndex } = blockchain.getLastBlock();
   const currentBlockData: BlockData = {
